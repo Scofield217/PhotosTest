@@ -205,7 +205,15 @@
     self.navigationController.navigationBar.hidden = NO;
     [self.navigationController popToRootViewControllerAnimated:YES];
     
-    [self.BrowerDelegate ReturnPhotoToPicker:_selectorPic];
+    NSMutableArray *ReturnPic = [NSMutableArray new];
+    
+    //pop回主页时取消掉图片的选择状态，因为主页要用到这个状态来判定是否删除图片
+    for (PhotoModel *model in _selectorPic) {
+        model.isSelect = NO;
+        [ReturnPic addObject:model];
+    }
+    
+    [self.BrowerDelegate ReturnPhotoToPicker:ReturnPic];
 }
 
 -(void) loadMainView
@@ -267,19 +275,11 @@
     if ([[_photoData objectAtIndex:indexPath.row] isKindOfClass:[PhotoModel class]]) {
         //加载相册中的数据时实用
         PhotoModel *photo = [_photoData objectAtIndex:indexPath.row];
-        [browerCell loadPHAssetItemForPics:photo.asset];
+        [browerCell loadPHAssetItemForPics:photo];
         
         _ImgCount.text = [NSString stringWithFormat:@"%lu",(unsigned long)[_selectorPic count]];
+        _PhotoSize = photo.asset_Size;
         
-        //刚进来时加载一次后就用scroll来判断，因为图片资源的获取会刷新多次导致无法准确获得对应的图片大小
-        __weak typeof (self) weakSelf = self;
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
-            PHAssetResource *resource = [[PHAssetResource assetResourcesForAsset:photo.asset] firstObject];
-            NSInteger size = [[resource valueForKey:@"fileSize"] longLongValue];
-            
-            weakSelf.PhotoSize = [weakSelf fileSizeWithInterge:size];
-        });
     }
     
     return browerCell;
@@ -294,10 +294,7 @@
     
     PhotoModel *photo = [_photoData objectAtIndex:_scrollIndex];
     
-    PHAssetResource *resource = [[PHAssetResource assetResourcesForAsset:photo.asset] firstObject];
-    NSInteger size = [[resource valueForKey:@"fileSize"] longLongValue];
-    
-    _PhotoSize = [self fileSizeWithInterge:size];
+    _PhotoSize = photo.asset_Size;
     
     if (_isHighQuality.selected) {
         _HighQuality.text = [NSString stringWithFormat:@"原图(%@)",_PhotoSize];
@@ -313,23 +310,6 @@
     else
     {
         _choose_btn.selected = NO;
-    }
-}
-
-#pragma mark 计算缓存大小
-- (NSString *)fileSizeWithInterge:(NSInteger)size{
-    // 1k = 1024, 1m = 1024k
-    if (size < 1024) {// 小于1k
-        return [NSString stringWithFormat:@"%ldB",(long)size];
-    }else if (size < 1024 * 1024){// 小于1m
-        CGFloat aFloat = (float)size/1024;
-        return [NSString stringWithFormat:@"%.0fKB",aFloat];
-    }else if (size < 1024 * 1024 * 1024){// 小于1G
-        CGFloat aFloat = (float)size/(1024 * 1024);
-        return [NSString stringWithFormat:@"%.1fMB",aFloat];
-    }else{
-        CGFloat aFloat = (float)size/(1024*1024*1024);
-        return [NSString stringWithFormat:@"%.1fG",aFloat];
     }
 }
 

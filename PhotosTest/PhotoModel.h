@@ -32,6 +32,10 @@
  */
 @property (nonatomic, copy)   NSDate *createDate;
 /**
+ 图片大小
+ */
+@property (nonatomic, copy)   NSString *asset_Size;
+/**
  判断该图片是否选中
  */
 @property (nonatomic, assign) BOOL isSelect;

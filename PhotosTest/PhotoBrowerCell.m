@@ -45,10 +45,10 @@
     return self;
 }
 
--(void)loadPHAssetItemForPics:(PHAsset *)assetItem
+-(void)loadPHAssetItemForPics:(PhotoModel *)photo
 {
     __weak typeof (self) weakSelf = self;
-    PHAsset *phAsset = (PHAsset *)assetItem;
+    PHAsset *phAsset = photo.asset;
     CGFloat photoWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat aspectRatio = phAsset.pixelWidth / (CGFloat)phAsset.pixelHeight;
     CGFloat multiple = [UIScreen mainScreen].scale;
@@ -71,6 +71,11 @@
         }
         
     }];
+    
+    PHAssetResource *resource = [[PHAssetResource assetResourcesForAsset:phAsset] firstObject];
+    NSInteger size = [[resource valueForKey:@"fileSize"] longLongValue];
+    
+    photo.asset_Size = [self fileSizeWithInterge:size];
 }
 
 -(void)changeFrameWithImage:(UIImage *)image
@@ -78,6 +83,23 @@
     CGFloat height = image.size.height / image.size.width * _browser_width;
     _PhotoImg.frame = CGRectMake(0, 0, _browser_width, height);
     _PhotoImg.center = CGPointMake(_browser_width / 2, _browser_height / 2);
+}
+
+#pragma mark 计算图片大小
+- (NSString *)fileSizeWithInterge:(NSInteger)size{
+    // 1k = 1024, 1m = 1024k
+    if (size < 1024) {// 小于1k
+        return [NSString stringWithFormat:@"%ldB",(long)size];
+    }else if (size < 1024 * 1024){// 小于1m
+        CGFloat aFloat = (float)size/1024;
+        return [NSString stringWithFormat:@"%.0fKB",aFloat];
+    }else if (size < 1024 * 1024 * 1024){// 小于1G
+        CGFloat aFloat = (float)size/(1024 * 1024);
+        return [NSString stringWithFormat:@"%.1fMB",aFloat];
+    }else{
+        CGFloat aFloat = (float)size/(1024*1024*1024);
+        return [NSString stringWithFormat:@"%.1fG",aFloat];
+    }
 }
 
 @end

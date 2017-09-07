@@ -280,10 +280,12 @@ static NSString *const footerId = @"footerId";
         brower.BrowerDelegate = self;
         brower.PhotoBlock = ^(id responseObject){
             
+            NSMutableArray *ReturnImg = (NSMutableArray *)responseObject;
+            
             //重新判断选择的图片
-            for(int i = 0;i < [weakSelf.imgViewArr_small count];i++)
+            for(int i = 0;i < [ReturnImg count];i++)
             {
-                PhotoModel *photo = weakSelf.imgViewArr_small[i];
+                PhotoModel *photo = ReturnImg[i];
                 
                 if (photo.isSelect) {
                     
@@ -478,13 +480,16 @@ static NSString *const footerId = @"footerId";
         
         brower.PhotoBlock = ^(id responseObject){
             
-            //重新判断选择的图片,因为回调的数组中保存了photo图片的选择状态，所以此处无需重新组装imgViewArr,直接reload就可以正确显示
-            for(int i = 0;i < [weakSelf.imgViewArr count];i++)
+            NSMutableArray *ReturnImg = (NSMutableArray *)responseObject;
+            
+            //重新判断选择的图片
+            for(int i = 0;i < [ReturnImg count];i++)
             {
-                PhotoModel *photo = weakSelf.imgViewArr[i];
+                PhotoModel *photo = ReturnImg[i];
                 
                 if (photo.isSelect) {
                     
+                    //去重
                     BOOL isbool = [weakSelf.imgViewArr_small containsObject:photo];
                     
                     if (!isbool) {

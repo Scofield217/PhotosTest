@@ -8,9 +8,10 @@
 
 #import <UIKit/UIKit.h>
 #import <Photos/Photos.h>
+#import "PhotoModel.h"
 
 @interface PhotoBrowerCell : UICollectionViewCell
 
--(void)loadPHAssetItemForPics:(PHAsset *)assetItem;
+-(void)loadPHAssetItemForPics:(PhotoModel *)photo;
 
 @end
