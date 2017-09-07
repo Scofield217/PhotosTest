@@ -43,8 +43,7 @@
         option.synchronous = YES;
         
         [[PHImageManager defaultManager] requestImageForAsset:photo.asset targetSize:CGSizeMake(200, 200) contentMode:PHImageContentModeAspectFit options:option resultHandler:^(UIImage *result, NSDictionary *info){
-            
-            weakSelf.bottom.hidden = YES;
+        
             //修正图片方向
             UIImage *targetImg = [weakSelf fixOrientation:result];
             
@@ -54,6 +53,23 @@
             weakSelf.PhotoImg.image = targetImg;
             
         }];
+    }
+    
+    if (photo.isSelect)
+    {
+        _DeleteImg.hidden = NO;
+    }
+    else{
+        _DeleteImg.hidden = YES;
+    }
+}
+
+-(void)setIsSelect:(BOOL)isSelect
+{
+    if (isSelect == NO) {
+        _DeleteImg.hidden = NO;
+    }else{
+        _DeleteImg.hidden = YES;
     }
 }
 

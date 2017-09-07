@@ -388,20 +388,30 @@ static NSString *const headId = @"headId";
     
     if (photo.isPhotoModel) {
         
-        UpdatePhotoCell *cell = (UpdatePhotoCell *)[collectionView cellForItemAtIndexPath:indexPath];
-        cell.DeleteImg.hidden = !cell.DeleteImg.hidden;
+        if (photo.isSelect)
+        {
+            photo.isSelect = NO;
+        }
+        else
+        {
+            photo.isSelect = YES;
+        }
+        
+        [_collectionView reloadData];
     }
     else
     {
+        __weak typeof (self) weakSelf = self;
+        
         //视频
         VideoModel *video = [VideoModel new];
         [video getVideo:photo];
         video.hidesBottomBarWhenPushed = YES;
         video.DeleteBlock = ^(BOOL isDelete){
             if (isDelete) {
-                [_VideoArr removeObject:photo];
+                [weakSelf.VideoArr removeObject:photo];
                 
-                [_collectionView reloadData];
+                [weakSelf.collectionView reloadData];
             }
         };
         [self.navigationController pushViewController:video animated:YES];

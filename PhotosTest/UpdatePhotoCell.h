@@ -14,9 +14,7 @@
 @property (strong, nonatomic) UIImageView *PhotoImg;
 @property (strong, nonatomic) UIButton *DeleteImg;
 
-@property (strong, nonatomic) UIImageView *VideoImg;
-@property (strong, nonatomic) UILabel *VideoDuration;
-@property (strong, nonatomic) UIView *bottom;
+@property(assign,nonatomic) BOOL isSelect;
 
 -(void)loadPhotoData:(PhotoModel *)photo withTargetSize:(CGSize)target;
 
