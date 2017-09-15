@@ -62,7 +62,7 @@ static NSString *const footerId = @"footerId";
         // 获得相机胶卷的图片
         PHFetchResult<PHAssetCollection *> *collectionResult1 = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeSmartAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:nil];
         for (PHAssetCollection *collection in collectionResult1) {
-            if (![collection.localizedTitle isEqualToString:@"Camera Roll"]) continue;
+            if (![collection.localizedTitle isEqualToString:@"相机胶卷"]) continue;
             [self searchAllImagesInCollection:collection];
             break;
         }

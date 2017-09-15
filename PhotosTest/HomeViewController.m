@@ -19,7 +19,7 @@ static NSString *const cellId = @"cellId";
 
 static NSString *const headId = @"headId";
 
-@interface HomeViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,PhotoPickerDelegate>
+@interface HomeViewController ()<UICollectionViewDelegate,UICollectionViewDataSource,PhotoPickerDelegate,UIImagePickerControllerDelegate,UINavigationControllerDelegate>
 
 @property (strong, nonatomic) UICollectionView *collectionView;
 @property (copy, nonatomic) NSMutableArray *ImageArr; //图片
@@ -88,6 +88,46 @@ static NSString *const headId = @"headId";
     if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
         UIAlertAction *cameraAc = [UIAlertAction actionWithTitle:CT style:(UIAlertActionStyleDefault) handler:^(UIAlertAction * _Nonnull action) {
             
+            AVAuthorizationStatus authStatus = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
+            
+            if(authStatus == AVAuthorizationStatusRestricted || authStatus == AVAuthorizationStatusDenied)
+            {
+                //无权限
+                //相册权限未开启
+                NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+                // app名称
+                NSString *app_Name = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+                
+                [weakSelf SetAlertWithTitle:@"提醒" andMessage:[NSString stringWithFormat:@"请在iPhone的“设置->隐私->相机”开启%@访问你的相机",app_Name]];
+            }
+            else
+            {
+                [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo completionHandler:^(BOOL granted) {
+                    
+                    if (granted) {
+                        
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            //第一次用户接受
+                            UIImagePickerController *imagePickerController = [[UIImagePickerController alloc] init];
+                            imagePickerController.delegate = weakSelf;
+                            imagePickerController.allowsEditing = YES;
+                            // 设置数据源类型
+                            imagePickerController.sourceType = UIImagePickerControllerSourceTypeCamera;
+                            
+                            if ([CT isEqual:@"录像"]) {
+                                imagePickerController.videoQuality = UIImagePickerControllerQualityTypeMedium; //录像质量
+                                imagePickerController.videoMaximumDuration = 15.0f; //录像最长时间
+                                imagePickerController.mediaTypes = [NSArray arrayWithObjects:@"public.movie", nil];
+                            }
+                            
+                            [weakSelf presentViewController:imagePickerController animated:YES completion:nil];
+                        });
+                    }
+                }];
+                
+                
+                
+            }
         }];
         [alertController addAction:cameraAc];
     }
@@ -116,8 +156,7 @@ static NSString *const headId = @"headId";
                 //授权后直接打开照片库
                 if (status == PHAuthorizationStatusAuthorized)
                 {
-                    dispatch_async(dispatch_get_main_queue(), ^
-                    {
+                    dispatch_async(dispatch_get_main_queue(), ^{
                         [weakSelf pushViewController];
                     });
                     
@@ -139,6 +178,94 @@ static NSString *const headId = @"headId";
     [alertController addAction:cancel];
     
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+#pragma mark 系统相机
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<NSString *,id> *)info
+{
+    [picker dismissViewControllerAnimated:YES completion:nil];
+    
+    NSString *mediaType = [info objectForKey:UIImagePickerControllerMediaType];
+    
+    if ([mediaType isEqualToString:@"public.image"])
+    {
+        UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
+        
+        PhotoModel *photo = [PhotoModel new];
+        photo.originImage = image;
+        photo.isPhotoModel = YES;
+        
+        if ([_ImageArr count] < 9) {
+            [_ImageArr addObject:photo];
+            
+            if ([_ImageArr count] > 9) {
+                [_ImageArr removeObject:photo];
+                [self SetAlertWithTitle:nil andMessage:@"最多只能传9张图片"];
+            }
+            else
+            {
+                [_collectionView reloadData];
+            }
+            
+        }
+        else
+        {
+            [self SetAlertWithTitle:nil andMessage:@"最多只能传9张图片"];
+        }
+    }
+    else
+    {
+        NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
+        AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:videoURL options:nil];
+        
+        UIImage *image = [self getVideoPreViewImage:videoURL];
+        
+        PhotoModel *photo = [PhotoModel new];
+        photo.originImage = image;
+        photo.asset_video = asset;
+        photo.isPhotoModel = NO;
+        
+        if ([_VideoArr count] < 5) {
+            [_VideoArr addObject:photo];
+            
+            if ([_VideoArr count] > 5) {
+                [_VideoArr removeObject:photo];
+                [self SetAlertWithTitle:nil andMessage:@"最多只能传5个视频"];
+            }
+            else
+            {
+                [_collectionView reloadData];
+            }
+            
+        }
+        else
+        {
+            [self SetAlertWithTitle:nil andMessage:@"最多只能传5个视频"];
+        }
+    }
+    
+    
+}
+
+#pragma mark 获取视频第一帧图片
+- (UIImage*) getVideoPreViewImage:(NSURL *)path
+{
+    AVURLAsset *asset = [[AVURLAsset alloc] initWithURL:path options:nil];
+    AVAssetImageGenerator *assetGen = [[AVAssetImageGenerator alloc] initWithAsset:asset];
+    
+    assetGen.appliesPreferredTrackTransform = YES;
+    CMTime time = CMTimeMakeWithSeconds(0.0, 600);
+    NSError *error = nil;
+    CMTime actualTime;
+    CGImageRef image = [assetGen copyCGImageAtTime:time actualTime:&actualTime error:&error];
+    UIImage *videoImage = [[UIImage alloc] initWithCGImage:image];
+    CGImageRelease(image);
+    return videoImage;
 }
 
 #pragma mark 跳转
@@ -369,7 +496,7 @@ static NSString *const headId = @"headId";
     return cell;
 }
 
-#pragma mark
+#pragma mark 选择
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     PhotoModel *photo = [PhotoModel new];

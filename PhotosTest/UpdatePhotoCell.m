@@ -38,21 +38,27 @@
     
     if ([photo isKindOfClass:[PhotoModel class]]) {
         
-        PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
-        option.resizeMode = PHImageRequestOptionsResizeModeFast;
-        option.synchronous = YES;
-        
-        [[PHImageManager defaultManager] requestImageForAsset:photo.asset targetSize:CGSizeMake(200, 200) contentMode:PHImageContentModeAspectFit options:option resultHandler:^(UIImage *result, NSDictionary *info){
-        
-            //修正图片方向
-            UIImage *targetImg = [weakSelf fixOrientation:result];
+        if (photo.asset != nil) {
+            PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+            option.resizeMode = PHImageRequestOptionsResizeModeFast;
+            option.synchronous = YES;
             
-            //缩小图片
-            targetImg = [weakSelf reSizeImage:targetImg ForSize:target];
-            
-            weakSelf.PhotoImg.image = targetImg;
-            
-        }];
+            [[PHImageManager defaultManager] requestImageForAsset:photo.asset targetSize:CGSizeMake(200, 200) contentMode:PHImageContentModeAspectFit options:option resultHandler:^(UIImage *result, NSDictionary *info){
+                
+                //修正图片方向
+                UIImage *targetImg = [weakSelf fixOrientation:result];
+                
+                //缩小图片
+                targetImg = [weakSelf reSizeImage:targetImg ForSize:target];
+                
+                weakSelf.PhotoImg.image = targetImg;
+                
+            }];
+        }
+        else
+        {
+            _PhotoImg.image = photo.originImage;
+        }
     }
     
     if (photo.isSelect)

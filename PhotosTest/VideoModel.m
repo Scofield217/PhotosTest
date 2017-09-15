@@ -58,7 +58,9 @@
     playerLayer.frame = CGRectMake(0, 0, ScreenWidth, ScreenHeight);
     [playerLayer displayIfNeeded];
     [self.view.layer insertSublayer:playerLayer atIndex:0];
-    playerLayer.videoGravity = AVLayerVideoGravityResizeAspect;
+    playerLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(playbackFinished:) name:AVPlayerItemDidPlayToEndTimeNotification object:player.currentItem];
     
     //视频
     _playerview = [[AVPlayerView alloc] init];
@@ -77,19 +79,28 @@
     [self.view addSubview:_PlayImg];
 }
 
+-(void)playbackFinished:(NSNotification *)not
+{
+    // 播放完成后重复播放
+    // 跳到最新的时间点开始播放
+    [_playerview.player seekToTime:CMTimeMake(0, 1)];
+    _PlayImg.hidden = NO;
+    _isPlay = NO;
+}
+
 -(void) PlayOrPause
 {
     if (_isPlay == NO)
     {
         _isPlay = YES;
-//        _PlayImg.image = XHImage(@"pause_white.png");
         _PlayImg.hidden = YES;
         [_playerview.player play];
+        
+        
     }
     else
     {
         _isPlay = NO;
-        _PlayImg.image = XHImage(@"start_white.png");
         _PlayImg.hidden = NO;
         [_playerview.player pause];
     }

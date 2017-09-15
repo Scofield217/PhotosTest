@@ -205,15 +205,64 @@
     self.navigationController.navigationBar.hidden = NO;
     [self.navigationController popToRootViewControllerAnimated:YES];
     
-    NSMutableArray *ReturnPic = [NSMutableArray new];
+//    NSMutableArray *ReturnPic = [NSMutableArray new];
+//    
+//    //pop回主页时取消掉图片的选择状态，因为主页要用到这个状态来判定是否删除图片
+//    for (PhotoModel *model in _selectorPic) {
+//        model.isSelect = NO;
+//        [ReturnPic addObject:model];
+//    }
     
-    //pop回主页时取消掉图片的选择状态，因为主页要用到这个状态来判定是否删除图片
-    for (PhotoModel *model in _selectorPic) {
-        model.isSelect = NO;
-        [ReturnPic addObject:model];
+    //和Picker统一，返回高清图
+    __block NSMutableArray<PhotoModel *> *photos = [NSMutableArray array];
+    __weak __typeof(self) weakSelf = self;
+    for (int i = 0; i < _selectorPic.count; i++) {
+        PhotoModel *photo = [_selectorPic objectAtIndex:i];
+        
+        PHAsset *phAsset = photo.asset;
+        
+        CGFloat photoWidth = [UIScreen mainScreen].bounds.size.width;
+        
+        CGFloat screenScale = 2.0;
+        if (photoWidth > 700) {
+            screenScale = 1.5;
+        }
+        
+        CGFloat aspectRatio = phAsset.pixelWidth / (CGFloat)phAsset.pixelHeight;
+        CGFloat pixelWidth = photoWidth * screenScale;
+        CGFloat pixelHeight = pixelWidth / aspectRatio;
+        CGSize imageSize = CGSizeMake(pixelWidth, pixelHeight);
+        
+        PHImageRequestOptions *option = [[PHImageRequestOptions alloc] init];
+        option.resizeMode = PHImageRequestOptionsResizeModeFast;
+        option.synchronous = YES;
+        [[PHImageManager defaultManager] requestImageForAsset:phAsset targetSize:imageSize contentMode:PHImageContentModeAspectFit options:option resultHandler:^(UIImage * _Nullable result, NSDictionary * _Nullable info) {
+            
+            BOOL downloadFinined = ![[info objectForKey:PHImageCancelledKey] boolValue] && ![info objectForKey:PHImageErrorKey] && ![[info objectForKey:PHImageResultIsDegradedKey] boolValue];
+            
+            UIImage *image = [UIView fixOrientation:result];
+            //设置BOOL判断，确定返回高清照片
+            if (downloadFinined) {
+                NSURL *imageUrl = (NSURL *)[info objectForKey:@"PHImageFileURLKey"];
+                
+                if (image){
+                    PhotoModel *model = [[PhotoModel alloc]init];
+                    model.asset = photo.asset;
+                    model.originImage = image;
+                    model.imageUrl = imageUrl;
+                    model.createDate = photo.asset.creationDate;
+                    model.isPhotoModel = YES;
+                    model.isSelect = NO;
+                    [photos addObject:model];
+                }
+                if (photos.count < weakSelf.selectorPic.count){
+                    return;
+                }
+                
+                [weakSelf.BrowerDelegate ReturnPhotoToPicker:photos];
+            }
+        }];
     }
-    
-    [self.BrowerDelegate ReturnPhotoToPicker:ReturnPic];
 }
 
 -(void) loadMainView
