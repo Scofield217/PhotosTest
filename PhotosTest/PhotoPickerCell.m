@@ -28,8 +28,9 @@
     if (self) {
         // Initialization code
         
-        _PhotoImg = [[UIImageView alloc] init];
-        _PhotoImg.frame = CGRectMake(0,0,frame.size.width,frame.size.height);
+        _PhotoImg = [[UIImageView alloc] initWithFrame:self.bounds];
+        _PhotoImg.layer.masksToBounds = YES;
+        _PhotoImg.contentMode = UIViewContentModeScaleAspectFill;
         [self addSubview:_PhotoImg];
         
         
@@ -88,13 +89,13 @@
     {
         [[PHImageManager defaultManager] requestImageForAsset:photo.asset targetSize:CGSizeMake(200, 200) contentMode:PHImageContentModeAspectFit options:nil resultHandler:^(UIImage *result, NSDictionary *info){
             
-            //修正图片方向
-            UIImage *targetImg = [weakSelf fixOrientation:result];
+//            //修正图片方向
+//            UIImage *targetImg = [weakSelf fixOrientation:result];
+//            
+//            //缩小图片
+//            targetImg = [weakSelf reSizeImage:targetImg ForSize:target];
             
-            //缩小图片
-            targetImg = [weakSelf reSizeImage:targetImg ForSize:target];
-            
-            weakSelf.PhotoImg.image = targetImg;
+            weakSelf.PhotoImg.image = result;
             photo.isPhotoModel = YES;
         }];
         

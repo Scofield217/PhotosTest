@@ -30,4 +30,6 @@ typedef void (^PhotoResult)(id responseObject);
 
 @property (assign, nonatomic) BOOL isPhotoModel; //判断是否为相机模式
 
+
+
 @end

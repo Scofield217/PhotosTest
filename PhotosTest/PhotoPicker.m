@@ -15,7 +15,7 @@ static NSString *const cellId = @"cellId";
 
 static NSString *const footerId = @"footerId";
 
-#define CellWidth (WIDTH(self.view)-8*1)/4
+#define CellWidth (ScreenWidth-8*1)/4
 
 @interface PhotoPicker ()<UICollectionViewDelegate,UICollectionViewDataSource,PhotoBrowerDelegate>
 
@@ -49,7 +49,6 @@ static NSString *const footerId = @"footerId";
     _VideoArr = [NSMutableArray new];
     
     [self getSystemPhotos];
-    
 }
 
 -(void) getSystemPhotos
@@ -114,22 +113,17 @@ static NSString *const footerId = @"footerId";
 
 -(void) loadMainView
 {
+    
     UICollectionViewFlowLayout *collectionFlowLayout = [[UICollectionViewFlowLayout alloc] init];
     
     collectionFlowLayout.footerReferenceSize =CGSizeMake(ScreenWidth, 30*ScreenHeight_scale);
-    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0,0,WIDTH(self.view),HEIGHT(self.view)-64) collectionViewLayout:collectionFlowLayout];
+    
+    _collectionView = [[UICollectionView alloc] initWithFrame:CGRectMake(0,0,WIDTH(self.view),HEIGHT(self.view)-40*ScreenHeight_scale) collectionViewLayout:collectionFlowLayout];
     
     _collectionView.backgroundColor = XHColor(whiteColor);
     _collectionView.dataSource = self;
     _collectionView.delegate = self;
     [self.view addSubview:_collectionView];
-    
-    NSInteger row = [_imgViewArr count];
-    if (row > 0) {
-        row = row - 1;
-        //滑动到底部
-        [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:row inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
-    }
     
     // 注册cell、sectionHeader、sectionFooter
     [_collectionView registerClass:[PhotoPickerCell class] forCellWithReuseIdentifier:cellId];
@@ -137,6 +131,15 @@ static NSString *const footerId = @"footerId";
     [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:footerId];
     
     [self loadBottomView];
+}
+
+- (void)viewDidLayoutSubviews
+{
+    [super viewDidLayoutSubviews];
+    //滚动到底部
+    if (_imgViewArr.count != 0) {
+        [_collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:_imgViewArr.count - 1 inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+    }
 }
 
 -(void) loadBottomView
@@ -444,24 +447,25 @@ static NSString *const footerId = @"footerId";
     cell.isSelect = photo.isSelect;
 }
 
+#pragma mark cell宽高
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     return (CGSize){CellWidth,CellWidth};
 }
 
-//屏幕间距，上左下右
+#pragma mark 屏幕间距，上左下右
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout insetForSectionAtIndex:(NSInteger)section
 {
     return UIEdgeInsetsMake(2, 1, 2, 1);
 }
 
-//纵向间距
+#pragma mark 纵向间距
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumLineSpacingForSectionAtIndex:(NSInteger)section
 {
     return 2;
 }
 
-//横向间距
+#pragma mark 横向间距
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 {
     return 1;
