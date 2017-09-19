@@ -32,7 +32,7 @@ static NSString *const footerId = @"footerId";
 
 @property (copy, nonatomic) NSMutableArray *VideoArr; //视频
 
-
+@property (strong, nonatomic) UILongPressGestureRecognizer *longPress;
 @end
 
 @implementation PhotoPicker
@@ -131,6 +131,11 @@ static NSString *const footerId = @"footerId";
     [_collectionView registerClass:[UICollectionReusableView class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:footerId];
     
     [self loadBottomView];
+    
+    //长按手势
+    _longPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(longPressed:)];
+    [_collectionView addGestureRecognizer:_longPress];
+    
 }
 
 - (void)viewDidLayoutSubviews
@@ -213,6 +218,7 @@ static NSString *const footerId = @"footerId";
 #pragma mark 完成
 -(void) Enter
 {
+    
     __block NSMutableArray<PhotoModel *> *photos = [NSMutableArray array];
     __weak __typeof(self) weakSelf = self;
     for (int i = 0; i < _imgViewArr_small.count; i++) {
@@ -469,6 +475,52 @@ static NSString *const footerId = @"footerId";
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout minimumInteritemSpacingForSectionAtIndex:(NSInteger)section
 {
     return 1;
+}
+
+#pragma mark 长按手势事件
+- (void)longPressed:(UILongPressGestureRecognizer *)longGesture {
+    //判断手势状态
+    switch (longGesture.state) {
+        case UIGestureRecognizerStateBegan:{
+            //判断手势落点位置是否在路径上
+            NSIndexPath *indexPath = [self.collectionView indexPathForItemAtPoint:[longGesture locationInView:self.collectionView]];
+            if (indexPath == nil) {
+                break;
+            }
+            //在路径上则开始移动该路径上的cell
+            [self.collectionView beginInteractiveMovementForItemAtIndexPath:indexPath];
+        }
+            break;
+        case UIGestureRecognizerStateChanged:
+            //移动过程当中随时更新cell位置
+            [self.collectionView updateInteractiveMovementTargetPosition:[longGesture locationInView:self.collectionView]];
+            break;
+        case UIGestureRecognizerStateEnded:
+            //移动结束后关闭cell移动
+            [self.collectionView endInteractiveMovement];
+            
+            //移动结束重新刷新一下，因为移动以后只是改变了当前cell和新的_imgViewArr，但页面中加载的还是原来的_imgViewArr，在多图选择时会出错
+            [self.collectionView reloadData];
+            break;
+        default:
+            [self.collectionView cancelInteractiveMovement];
+            break;
+    }
+}
+
+- (BOOL)collectionView:(UICollectionView *)collectionView canMoveItemAtIndexPath:(NSIndexPath *)indexPath{
+    //返回YES允许其item移动
+    return YES;
+}
+
+#pragma mark 移动item
+- (void)collectionView:(UICollectionView *)collectionView moveItemAtIndexPath:(NSIndexPath *)sourceIndexPath toIndexPath:(NSIndexPath*)destinationIndexPath {
+    //取出源item数据
+    id objc = [_imgViewArr objectAtIndex:sourceIndexPath.item];
+    //从资源数组中移除该数据
+    [_imgViewArr removeObject:objc];
+    //将数据插入到资源数组中的目标位置上
+    [_imgViewArr insertObject:objc atIndex:destinationIndexPath.item];
 }
 
 #pragma mark 选中
