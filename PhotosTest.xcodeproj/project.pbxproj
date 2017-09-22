@@ -36,7 +36,6 @@
 		BA9FE13D1F5F9EBB002D55D9 /* UpdataReusableHead.m in Sources */ = {isa = PBXBuildFile; fileRef = BA9FE13C1F5F9EBB002D55D9 /* UpdataReusableHead.m */; };
 		BA9FE1401F5FE980002D55D9 /* pause_white.png in Resources */ = {isa = PBXBuildFile; fileRef = BA9FE13E1F5FE980002D55D9 /* pause_white.png */; };
 		BA9FE1411F5FE980002D55D9 /* start_white.png in Resources */ = {isa = PBXBuildFile; fileRef = BA9FE13F1F5FE980002D55D9 /* start_white.png */; };
-		BA9FE1CB1F6F6BFA002D55D9 /* TestView.m in Sources */ = {isa = PBXBuildFile; fileRef = BA9FE1CA1F6F6BFA002D55D9 /* TestView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -87,8 +86,6 @@
 		BA9FE13F1F5FE980002D55D9 /* start_white.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = start_white.png; sourceTree = "<group>"; };
 		BA9FE1C71F6B7B3B002D55D9 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		BA9FE1C81F6B7B3B002D55D9 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
-		BA9FE1C91F6F6BFA002D55D9 /* TestView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestView.h; sourceTree = "<group>"; };
-		BA9FE1CA1F6F6BFA002D55D9 /* TestView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -131,8 +128,6 @@
 				BA9FE0E91F5E3A4D002D55D9 /* ViewController.m */,
 				BA9FE12E1F5E86BB002D55D9 /* HomeViewController.h */,
 				BA9FE12F1F5E86BB002D55D9 /* HomeViewController.m */,
-				BA9FE1C91F6F6BFA002D55D9 /* TestView.h */,
-				BA9FE1CA1F6F6BFA002D55D9 /* TestView.m */,
 				BA9FE0F91F5E3AAB002D55D9 /* CustomPhotos */,
 				BA9FE0EB1F5E3A4D002D55D9 /* Main.storyboard */,
 				BA9FE0EE1F5E3A4D002D55D9 /* Assets.xcassets */,
@@ -318,7 +313,6 @@
 				BA9FE0FC1F5E3B04002D55D9 /* PhotoPicker.m in Sources */,
 				BA9FE1251F5E5ABF002D55D9 /* AVPlayerView.m in Sources */,
 				BA9FE1051F5E3B79002D55D9 /* PhotoPickerCell.m in Sources */,
-				BA9FE1CB1F6F6BFA002D55D9 /* TestView.m in Sources */,
 				BA9FE1101F5E456F002D55D9 /* UIView+CGRect.m in Sources */,
 				BA9FE11A1F5E4EF8002D55D9 /* UpdatePhotoCell.m in Sources */,
 				BA9FE0EA1F5E3A4D002D55D9 /* ViewController.m in Sources */,

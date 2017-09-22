@@ -124,9 +124,6 @@ static NSString *const headId = @"headId";
                         });
                     }
                 }];
-                
-                
-                
             }
         }];
         [alertController addAction:cameraAc];
@@ -566,12 +563,6 @@ static NSString *const headId = @"headId";
     }]];
     
     [self presentViewController:alertView animated:true completion:nil];
-}
-
-#pragma mark 提交
--(void) GoPublic
-{
-    
 }
 
 #pragma mark 弹出提示框
