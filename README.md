@@ -4,4 +4,4 @@ Photos框架自定义相册，包括功能：获取相册图片、视频、拍�
 ![效果图](https://github.com/Scofield217/PhotosTest/blob/master/Untitled.gif?raw=true)
 
    
-具体的介绍可以到简书查看 [简书](http://www.jianshu.com/p/4c72c4ea85e6)
+具体的介绍可以到掘金查看 [掘金](https://juejin.im/post/5a31cbfc51882527541052e8)
